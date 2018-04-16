@@ -2,8 +2,13 @@ package com.soon.android;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.widget.FrameLayout;
+import android.widget.Switch;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
@@ -24,18 +29,31 @@ import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
+import com.soon.android.fragments.DishesFragment;
+import com.soon.android.fragments.HomeFragment;
+import com.soon.android.fragments.OrdersFragment;
+import com.soon.android.fragments.PersonalInformationFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import soon.com.android.R;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.chart)
+
     LineChart mLineChart;
+
+    @BindView(R.id.content_container)
+    FrameLayout contentContainer;
+
+    @BindView(R.id.bottom_bar)
+    BottomBar bottomBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +61,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        showChart();
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(int tabId) {
+                switch (tabId){
+                    case R.id.tab_home:replaceFragment(new HomeFragment());break;
+                    case R.id.tab_dishes:replaceFragment(new DishesFragment());break;
+                    case R.id.tab_orders:replaceFragment(new OrdersFragment());break;
+                    case R.id.tab_personal_information:replaceFragment(new PersonalInformationFragment());break;
+                    default:
+                        break;
+                }
+            }
+        });
+        replaceFragment(new HomeFragment());
+
+        //showChart();
     }
 
-    private void showChart(){
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content_container, fragment);
+        transaction.commit();
+    }
+
+    private void showChart() {
 // *************************数据转换********************* //
         float[] dataObjects = {1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1};
         List<Entry> entries = new ArrayList<>();
@@ -325,4 +365,6 @@ public class MainActivity extends AppCompatActivity {
         mLineChart.setKeepPositionOnRotation(false); // 设置当屏幕方向变化时，是否保留之前的缩放与滚动位置，默认：false
 
     }
+
+
 }
