@@ -19,7 +19,9 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+
         Fresco.initialize(this);//初始化Fresco
+
         Bmob.initialize(this, "84aaecd322d3f4afa028222b754f2f98");//初始化Bmob
     }
 

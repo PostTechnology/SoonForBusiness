@@ -21,6 +21,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="92FIToPqHZBgNg4t3MHvx0lqv7iAq3de" />
+
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +33,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
+
+        <activity android:name=".LoginActivity" />
+        <activity
+            android:name=".UpdatePwdActivity"
+            android:label="修改密码" />
+        <activity
+            android:name=".AuthenticationActivity"
+            android:label="商家认证" />
+        <activity android:name=".LocalPoiActivity" />
+        <activity android:name=".PersonalCenterActivity"></activity>
         <activity android:name=".AddDishesActivity"></activity>
     </application>
 
