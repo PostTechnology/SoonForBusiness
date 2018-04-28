@@ -321,31 +321,60 @@
             </LinearLayout>
         </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/home_module"
-        android:orientation="vertical">
-
-        <TextView
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#FAFAFA"
-            android:padding="5dp"
-            android:text="经营信息（近四月）"
-            android:textColor="#000"
-            android:textSize="12sp" />
+            android:layout_height="match_parent">
 
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="350dp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/home_module"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#FAFAFA"
+                    android:padding="5dp"
+                    android:text="经营信息（近四月）"
+                    android:textColor="#000"
+                    android:textSize="12sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/linechart"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/home_module"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#FAFAFA"
+                    android:padding="5dp"
+                    android:text="经营信息（近四月）"
+                    android:textColor="#000"
+                    android:textSize="12sp" />
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp" />
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
