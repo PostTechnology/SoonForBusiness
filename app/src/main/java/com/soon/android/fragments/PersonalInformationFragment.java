@@ -70,6 +70,8 @@ public class PersonalInformationFragment extends Fragment {
             storeName.setText(name);
             Bitmap bitmap = BitmapFactory.decodeFile(imageUrl);
             headFile.setImageBitmap(bitmap);
+        }else{
+            headFile.setClickable(false);
         }
     }
 
@@ -93,6 +95,7 @@ public class PersonalInformationFragment extends Fragment {
                 editor.clear();
                 editor.commit();
                 LoginActivity.actionStart(getActivity());
+                getActivity().finish();
                 break;
         }
     }

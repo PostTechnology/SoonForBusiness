@@ -44,56 +44,70 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final String userAccount = accountEdits.getText().toString();
-                final String userPassword = passwordEdit.getText().toString();
-                BmobUser user = new BmobUser();
-                user.setUsername(userAccount);
-                user.setPassword(userPassword);
-                user.login(new SaveListener<BmobUser>() {
-                    @Override
-                    public void done(final BmobUser o, BmobException e) {
-                        if(e == null){
-                            BmobQuery<Store> query = new BmobQuery<>();
-                            query.addWhereEqualTo("userObjectId", o.getObjectId());
-                            query.findObjects(new FindListener<Store>() {
-                                @Override
-                                public void done(List<Store> list, BmobException e) {
-                                    if (e == null) {
-                                        SharedPreferences.Editor editor = getSharedPreferences("store",MODE_PRIVATE).edit();
-                                        if(list.size() > 0){
-                                            Store store = list.get(0);
-                                            editor.putString("name", store.getName());
-                                            editor.putString("objectId", store.getObjectId());
-                                            editor.putString("image", store.getImage().getFilename());
-                                            editor.putString("state", "已认证");
-                                            editor.apply();
-                                            Toast.makeText(LoginActivity.this, "登录成功！" + store.getName(), Toast.LENGTH_SHORT).show();
-                                            Log.d("TAG", "success");
-                                            BmobFile bmobFile = store.getImage();
-                                            if(bmobFile != null){
-                                                downloadFile(bmobFile);
+        init();
+    }
+
+    private void init(){
+        BmobUser bmobUser = BmobUser.getCurrentUser();
+        if(bmobUser != null){
+            MainActivity.actionStart(this);
+            this.finish();
+        }else{
+            loginBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final String userAccount = accountEdits.getText().toString();
+                    final String userPassword = passwordEdit.getText().toString();
+                    BmobUser user = new BmobUser();
+                    user.setUsername(userAccount);
+                    user.setPassword(userPassword);
+                    user.login(new SaveListener<BmobUser>() {
+                        @Override
+                        public void done(final BmobUser o, BmobException e) {
+                            if(e == null){
+                                BmobQuery<Store> query = new BmobQuery<>();
+                                query.addWhereEqualTo("userObjectId", o.getObjectId());
+                                query.findObjects(new FindListener<Store>() {
+                                    @Override
+                                    public void done(List<Store> list, BmobException e) {
+                                        if (e == null) {
+                                            SharedPreferences.Editor editor = getSharedPreferences("store",MODE_PRIVATE).edit();
+                                            if(list.size() > 0){
+                                                Store store = list.get(0);
+                                                editor.putString("name", store.getName());
+                                                editor.putString("objectId", store.getObjectId());
+                                                editor.putString("image", store.getImage().getFilename());
+                                                editor.putFloat("offerPrice", store.getOfferPrice());
+                                                editor.putString("description", store.getDescription());
+                                                editor.putString("state", "已认证");
+                                                editor.apply();
+                                                Toast.makeText(LoginActivity.this, "登录成功！" + store.getName(), Toast.LENGTH_SHORT).show();
+                                                Log.d("TAG", "success");
+                                                BmobFile bmobFile = store.getImage();
+                                                if(bmobFile != null){
+                                                    downloadFile(bmobFile);
+                                                }
+                                                MainActivity.actionStart(LoginActivity.this);
+                                                LoginActivity.this.finish();
+                                            }else{
+                                                editor.putString("state", "未认证");
+                                                editor.apply();
                                             }
+                                            finish();
                                         }else{
-                                            editor.putString("state", "未认证");
-                                            editor.apply();
+                                            Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
                                         }
-                                        finish();
-                                    }else{
-                                        Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
                                     }
-                                }
-                            });
-                        }else{
-                            Toast.makeText(LoginActivity.this, "用户名或密码错误!", Toast.LENGTH_SHORT).show();
-                            Log.d("TAG", "error: " + e.getMessage());
+                                });
+                            }else{
+                                Toast.makeText(LoginActivity.this, "用户名或密码错误!", Toast.LENGTH_SHORT).show();
+                                Log.d("TAG", "error: " + e.getMessage());
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        }
     }
 
     // 将头像缓存到本地
