@@ -61,20 +61,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        final HomeFragment homeFragment = new HomeFragment();
+        final DishesFragment dishesFragment = new DishesFragment();
+        final OrdersFragment ordersFragment = new OrdersFragment();
+        final PersonalInformationFragment personalInformationFragment = new PersonalInformationFragment();
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(int tabId) {
                 switch (tabId){
-                    case R.id.tab_home:replaceFragment(new HomeFragment());break;
-                    case R.id.tab_dishes:replaceFragment(new DishesFragment());break;
-                    case R.id.tab_orders:replaceFragment(new OrdersFragment());break;
-                    case R.id.tab_personal_information:replaceFragment(new PersonalInformationFragment());break;
+                    case R.id.tab_home:replaceFragment(homeFragment);break;
+                    case R.id.tab_dishes:replaceFragment(dishesFragment);break;
+                    case R.id.tab_orders:replaceFragment(ordersFragment);break;
+                    case R.id.tab_personal_information:replaceFragment(personalInformationFragment);break;
                     default:
                         break;
                 }
             }
         });
-        replaceFragment(new HomeFragment());
+        replaceFragment(homeFragment);
 
         //showChart();
     }
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.content_container, fragment);
+        transaction.addToBackStack(null);
         transaction.commit();
     }
 
