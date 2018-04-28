@@ -47,28 +47,27 @@ public class MainActivity extends AppCompatActivity {
         Bmob.initialize(this, "84aaecd322d3f4afa028222b754f2f98");
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-
-        replaceFragment(new PersonalInformationFragment());
+        init();
+        replaceFragment( new PersonalInformationFragment());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         List<String> permissionList = new ArrayList<>();
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.READ_PHONE_STATE);
         }
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
-        if(!permissionList.isEmpty()){
+        if (!permissionList.isEmpty()) {
             String[] permissions = permissionList.toArray(new String[permissionList.size()]);
             ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
-        }else{
+        } else {
             init();
         }
     }
@@ -97,6 +96,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
+        final HomeFragment homeFragment = new HomeFragment();
+        final DishesFragment dishesFragment = new DishesFragment();
+        final OrdersFragment ordersFragment = new OrdersFragment();
+        final PersonalInformationFragment personalInformationFragment = new PersonalInformationFragment();
         BmobUser bmobUser = BmobUser.getCurrentUser();
         if(bmobUser != null){
             // 允许用户使用应用
@@ -108,16 +111,16 @@ public class MainActivity extends AppCompatActivity {
                     if(state.equals("已认证")){
                         switch (tabId) {
                             case R.id.tab_home:
-                                replaceFragment(new HomeFragment());
+                                replaceFragment(homeFragment);
                                 break;
                             case R.id.tab_dishes:
-                                replaceFragment(new DishesFragment());
+                                replaceFragment(dishesFragment);
                                 break;
                             case R.id.tab_orders:
-                                replaceFragment(new OrdersFragment());
+                                replaceFragment(ordersFragment);
                                 break;
                             case R.id.tab_personal_information:
-                                replaceFragment(new PersonalInformationFragment());
+                                replaceFragment(personalInformationFragment);
                                 break;
                             default:
                                 break;
@@ -137,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
                                 break;
                             case R.id.tab_personal_information:
-                                replaceFragment(new PersonalInformationFragment());
+                                replaceFragment(personalInformationFragment);
                                 break;
                             default:
                                 break;
@@ -156,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.content_container, fragment);
+                transaction.addToBackStack(null);
         transaction.commit();
     }
 }
