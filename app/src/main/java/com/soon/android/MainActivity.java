@@ -2,6 +2,7 @@ package com.soon.android;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -29,7 +30,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.bmob.v3.Bmob;
-import cn.bmob.v3.BmobUser;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -100,59 +100,52 @@ public class MainActivity extends AppCompatActivity {
         final DishesFragment dishesFragment = new DishesFragment();
         final OrdersFragment ordersFragment = new OrdersFragment();
         final PersonalInformationFragment personalInformationFragment = new PersonalInformationFragment();
-        BmobUser bmobUser = BmobUser.getCurrentUser();
-        if(bmobUser != null){
-            // 允许用户使用应用
-            bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
-                @Override
-                public void onTabSelected(int tabId) {
-                    SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
-                    String state = preferences.getString("state","");
-                    if(state.equals("已认证")){
-                        switch (tabId) {
-                            case R.id.tab_home:
-                                replaceFragment(homeFragment);
-                                break;
-                            case R.id.tab_dishes:
-                                replaceFragment(dishesFragment);
-                                break;
-                            case R.id.tab_orders:
-                                replaceFragment(ordersFragment);
-                                break;
-                            case R.id.tab_personal_information:
-                                replaceFragment(personalInformationFragment);
-                                break;
-                            default:
-                                break;
-                        }
-                    }else if (state.equals("未认证")){
-                        switch (tabId) {
-                            case R.id.tab_home:
-//                                replaceFragment(new HomeFragment());
-                                Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.tab_dishes:
-//                                replaceFragment(new DishesFragment());
-                                Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.tab_orders:
-//                                replaceFragment(new OrdersFragment());
-                                Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
-                                break;
-                            case R.id.tab_personal_information:
-                                replaceFragment(personalInformationFragment);
-                                break;
-                            default:
-                                break;
-                        }
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(int tabId) {
+                SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
+                String state = preferences.getString("state","");
+                if(state.equals("已认证")){
+                    switch (tabId) {
+                        case R.id.tab_home:
+                            replaceFragment(homeFragment);
+                            break;
+                        case R.id.tab_dishes:
+                            replaceFragment(dishesFragment);
+                            break;
+                        case R.id.tab_orders:
+                            replaceFragment(ordersFragment);
+                            break;
+                        case R.id.tab_personal_information:
+                            replaceFragment(personalInformationFragment);
+                            break;
+                        default:
+                            break;
                     }
-
+                }else if (state.equals("未认证")){
+                    switch (tabId) {
+                        case R.id.tab_home:
+//                                replaceFragment(new HomeFragment());
+                            Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.tab_dishes:
+//                                replaceFragment(new DishesFragment());
+                            Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.tab_orders:
+//                                replaceFragment(new OrdersFragment());
+                            Toast.makeText(MainActivity.this, "请先完成认证！", Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.tab_personal_information:
+                            replaceFragment(personalInformationFragment);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-            });
-        }else{
-            //缓存用户对象为空时， 可打开用户注册界面…
-            LoginActivity.actionStart(this);
-        }
+
+            }
+        });
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -161,5 +154,12 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.content_container, fragment);
                 transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    // 活动跳转
+    public static void actionStart(Context context){
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 }

@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -74,6 +75,7 @@ public class PersonalCenterActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        init();
     }
 
     @OnClick({R.id.personal_img, R.id.update_info_btn})
@@ -89,60 +91,94 @@ public class PersonalCenterActivity extends AppCompatActivity {
         }
     }
 
-    private void updateStore(){
-        progressDialog = ProgressDialogUtil.getProgressDialog(PersonalCenterActivity.this, "提交信息", "Waiting...", false);
-        progressDialog.show();
+    private void init(){
         SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
-        String objectId = preferences.getString("objectId", "");
-        Store store = new Store();
-        store.setName(StoreNewNameText.getText().toString());
-        store.setOfferPrice(Float.parseFloat(StoreOfferPriceText.getText().toString()));
-        store.setDescription(StoreDescriptionText.getText().toString());
-        if(isUpImg){
-            store.setImage(savePhoto());
-        }
-        store.update(objectId, new UpdateListener() {
-            @Override
-            public void done(BmobException e) {
-                if(e==null){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.dismiss();
-                            Toast.makeText(PersonalCenterActivity.this,"更新成功!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }else{
-                    Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
-                }
-            }
-        });
+        String name = preferences.getString("name","");
+        String imageUrl = Environment.getExternalStorageDirectory() + "/" + preferences.getString("image","");
+        Float offerPrice = preferences.getFloat("offerPrice",0f);
+        String description = preferences.getString("description","");
+
+        Bitmap bitmap = BitmapFactory.decodeFile(imageUrl);
+        PersonalImg.setImageBitmap(bitmap);
+        StoreNewNameText.setText(name);
+        StoreOfferPriceText.setText(offerPrice + "");
+        StoreDescriptionText.setText(description);
     }
 
-    private BmobFile savePhoto(){
-        //String picPath = imagePath.substring(1);
-        //上传文件
-        String picPath = CameraAlbumUtil.imagePath;
-        Toast.makeText(this, picPath, Toast.LENGTH_SHORT).show();
+    private void updateStore(){
+        if(isUpImg){
+            String picPath = CameraAlbumUtil.imagePath;
+            Toast.makeText(this, picPath, Toast.LENGTH_SHORT).show();
 
-        final BmobFile bmobFile = new BmobFile(new File(picPath));
-        bmobFile.uploadblock(new UploadFileListener() {
-            @Override
-            public void done(BmobException e) {
-                if(e==null){
-                    //bmobFile.getFileUrl()--返回的上传文件的完整地址
-                    Log.d("TAG", "上传文件成功:" + bmobFile.getFileUrl());
-                }else{
-                    Log.d("TAG", "上传文件失败：" + e.getMessage());
+            final BmobFile bmobFile = new BmobFile(new File(picPath));
+            bmobFile.uploadblock(new UploadFileListener() {
+                @Override
+                public void done(BmobException e) {
+                    if(e==null){
+                        //bmobFile.getFileUrl()--返回的上传文件的完整地址
+                        Log.d("TAG", "上传文件成功:" + bmobFile.getFileUrl());
+                        progressDialog = ProgressDialogUtil.getProgressDialog(PersonalCenterActivity.this, "提交信息", "Waiting...", false);
+                        progressDialog.show();
+                        SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
+                        String objectId = preferences.getString("objectId", "");
+                        Store store = new Store();
+                        store.setName(StoreNewNameText.getText().toString());
+                        store.setOfferPrice(Float.parseFloat(StoreOfferPriceText.getText().toString()));
+                        store.setDescription(StoreDescriptionText.getText().toString());
+                        store.setImage(bmobFile);
+                        store.update(objectId, new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if(e==null){
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progressDialog.dismiss();
+                                            Toast.makeText(PersonalCenterActivity.this,"更新成功!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }else{
+                                    Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
+                                }
+                            }
+                        });
+                    }else{
+                        Log.d("TAG", "上传文件失败：" + e.getMessage());
+                    }
                 }
-            }
-            @Override
-            public void onProgress(Integer value) {
-                super.onProgress(value);
-                Log.d("TAG", "onProgress: " + value);
-            }
-        });
-        return bmobFile;
+                @Override
+                public void onProgress(Integer value) {
+                    super.onProgress(value);
+                    Log.d("TAG", "onProgress: " + value);
+                }
+            });
+        }else{
+            progressDialog = ProgressDialogUtil.getProgressDialog(PersonalCenterActivity.this, "提交信息", "Waiting...", false);
+            progressDialog.show();
+            SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
+            String objectId = preferences.getString("objectId", "");
+            Store store = new Store();
+            store.setName(StoreNewNameText.getText().toString());
+            store.setOfferPrice(Float.parseFloat(StoreOfferPriceText.getText().toString()));
+            store.setDescription(StoreDescriptionText.getText().toString());
+            store.update(objectId, new UpdateListener() {
+                @Override
+                public void done(BmobException e) {
+                    if(e==null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressDialog.dismiss();
+                                Toast.makeText(PersonalCenterActivity.this,"更新成功!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else{
+                        Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
+                    }
+                }
+            });
+        }
+
     }
 
     //显示列表对话框

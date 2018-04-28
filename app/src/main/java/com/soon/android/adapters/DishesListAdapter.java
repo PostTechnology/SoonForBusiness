@@ -1,8 +1,6 @@
 package com.soon.android.adapters;
 
 import android.util.Log;
-import android.widget.ImageView;
-
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;

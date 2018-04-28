@@ -89,22 +89,21 @@ public class AuthenticationActivity extends AppCompatActivity {
                 if(StoreLocalText.getText().equals("") || StoreLocalText.getText() == null){
                     Toast.makeText(AuthenticationActivity.this,"请选择好位置后再进行提交！", Toast.LENGTH_SHORT).show();
                 }else{
-                    createStore();
-                    BmobUser.logOut();   //清除缓存用户对象
-                    finish();
+                    savePhoto();
                 }
                 break;
         }
     }
 
-    private void createStore(){
+    private void createStore(BmobFile bmobFile){
         progressDialog = ProgressDialogUtil.getProgressDialog(AuthenticationActivity.this, "提交信息", "Waiting...", false);
         progressDialog.show();
         BmobUser currentUser = BmobUser.getCurrentUser();
+        Log.i("TAG", "bmobFile: " + bmobFile.getFilename());
         Store store = new Store();
         store.setUserObjectId(currentUser.getObjectId());
         store.setName(StoreNameText.getText().toString());
-        store.setImage(savePhoto());
+        store.setImage(bmobFile);
         store.setLongitude(longitude);
         store.setLatitude(latitude);
         store.save(new SaveListener<String>() {
@@ -116,17 +115,19 @@ public class AuthenticationActivity extends AppCompatActivity {
                         public void run() {
                             progressDialog.dismiss();
                             Toast.makeText(AuthenticationActivity.this,"认证成功！请重新登录", Toast.LENGTH_SHORT).show();
+                            BmobUser.logOut();   //清除缓存用户对象
+                            finish();
                         }
                     });
                 }else{
-                    Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                    Log.i("TAG","认证失败："+e.getMessage()+","+e.getErrorCode());
                 }
             }
         });
     }
 
 
-    private BmobFile savePhoto(){
+    private void savePhoto(){
         //String picPath = imagePath.substring(1);
         //上传文件
         String picPath = CameraAlbumUtil.imagePath;
@@ -139,6 +140,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                 if(e==null){
                     //bmobFile.getFileUrl()--返回的上传文件的完整地址
                     Log.d("TAG", "上传文件成功:" + bmobFile.getFileUrl());
+                    createStore(bmobFile);
                 }else{
                     Log.d("TAG", "上传文件失败：" + e.getMessage());
                 }
@@ -149,7 +151,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                 Log.d("TAG", "onProgress: " + value);
             }
         });
-        return bmobFile;
     }
 
     //显示列表对话框
