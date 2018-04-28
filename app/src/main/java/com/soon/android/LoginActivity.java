@@ -65,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void done(final BmobUser o, BmobException e) {
                             if(e == null){
+                                Log.i("TAG", "userObjectId: " + o.getObjectId());
                                 BmobQuery<Store> query = new BmobQuery<>();
                                 query.addWhereEqualTo("userObjectId", o.getObjectId());
                                 query.findObjects(new FindListener<Store>() {
@@ -77,29 +78,37 @@ public class LoginActivity extends AppCompatActivity {
                                                 editor.putString("name", store.getName());
                                                 editor.putString("objectId", store.getObjectId());
                                                 editor.putString("image", store.getImage().getFilename());
-                                                editor.putFloat("offerPrice", store.getOfferPrice());
-                                                editor.putString("description", store.getDescription());
-                                                editor.putString("state", "已认证");
-                                                editor.apply();
-                                                Toast.makeText(LoginActivity.this, "登录成功！" + store.getName(), Toast.LENGTH_SHORT).show();
-                                                Log.d("TAG", "success");
-                                                BmobFile bmobFile = store.getImage();
-                                                if(bmobFile != null){
-                                                    downloadFile(bmobFile);
+                                                try{
+                                                    editor.putFloat("offerPrice", store.getOfferPrice());
+                                                }catch (Exception e1){
+                                                    Log.i("Exception", "错误信息: " + e.getMessage());
+                                                }finally {
+                                                    editor.putString("description", store.getDescription());
+                                                    editor.putString("state", "已认证");
+                                                    editor.apply();
+                                                    Toast.makeText(LoginActivity.this, "登录成功！" + store.getName(), Toast.LENGTH_SHORT).show();
+                                                    Log.d("TAG", "success");
+                                                    BmobFile bmobFile = store.getImage();
+                                                    if(bmobFile != null){
+                                                        downloadFile(bmobFile);
+                                                    }
+                                                    MainActivity.actionStart(LoginActivity.this);
+                                                    LoginActivity.this.finish();
                                                 }
-                                                MainActivity.actionStart(LoginActivity.this);
-                                                LoginActivity.this.finish();
                                             }else{
+                                                Toast.makeText(LoginActivity.this, "登录成功！尚未认证 ", Toast.LENGTH_SHORT).show();
                                                 editor.putString("state", "未认证");
                                                 editor.apply();
+                                                MainActivity.actionStart(LoginActivity.this);
+                                                LoginActivity.this.finish();
                                             }
-                                            finish();
                                         }else{
-                                            Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                                            Log.i("bmob","登录失败："+e.getMessage()+","+e.getErrorCode());
                                         }
                                     }
                                 });
                             }else{
+                                Log.i("TAG", "done: " + userAccount + "," + userPassword);
                                 Toast.makeText(LoginActivity.this, "用户名或密码错误!", Toast.LENGTH_SHORT).show();
                                 Log.d("TAG", "error: " + e.getMessage());
                             }
