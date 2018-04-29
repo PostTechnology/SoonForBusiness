@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.soon.android.bmobBean.Store;
@@ -37,6 +38,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.login)
     Button loginBtn;
+
+    @BindView(R.id.register_access)
+    TextView registerBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +85,8 @@ public class LoginActivity extends AppCompatActivity {
                                                 try{
                                                     editor.putFloat("offerPrice", store.getOfferPrice());
                                                 }catch (Exception e1){
-                                                    Log.i("Exception", "错误信息: " + e.getMessage());
+                                                    editor.putFloat("offerPrice", 0f);
+//                                                    Log.i("Exception", "错误信息: " + e.getMessage());
                                                 }finally {
                                                     editor.putString("description", store.getDescription());
                                                     editor.putString("state", "已认证");
@@ -114,6 +119,13 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
                     });
+                }
+            });
+
+            registerBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    RegisterActivity.actionStart(LoginActivity.this);
                 }
             });
         }

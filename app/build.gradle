@@ -61,7 +61,6 @@ dependencies {
     //底部导航栏
     compile 'com.roughike:bottom-bar:2.3.1'
 
-
     // 圆形图片控件
     compile 'de.hdodenhof:circleimageview:2.2.0'
 

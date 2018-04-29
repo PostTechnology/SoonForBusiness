@@ -16,10 +16,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.soon.android.R;
 import com.soon.android.bmobBean.Goods;
 import com.soon.android.bmobBean.Order;
 import com.soon.android.util.BarChartManager;
+import com.soon.android.util.LineChartManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +63,9 @@ public class HomeFragment extends Fragment {
 
     @BindView(R.id.chart)
     BarChart mBarChart;
+
+    @BindView(R.id.linechart)
+    LineChart mLineChart;
 
     private Handler handler1 = new Handler() {
         public void handleMessage(Message msg) {
@@ -123,7 +128,7 @@ public class HomeFragment extends Fragment {
             switch (msg.what) {
                 case 1:
                     ArrayList<ArrayList<Float>> obj = (ArrayList<ArrayList<Float>>) msg.obj;
-                    drawCharts(obj);
+                    drawBarCharts(obj);
                     break;
                 default:
                     break;
@@ -153,7 +158,8 @@ public class HomeFragment extends Fragment {
         SharedPreferences preferences = getActivity().getSharedPreferences("store", Context.MODE_PRIVATE);
         String objectId = preferences.getString("objectId", "");
         initHeader(objectId);
-        initCharts(objectId);
+        initBarCharts(objectId);
+        initLineCharts(objectId);
     }
 
     // 加载栏目
@@ -235,9 +241,8 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // 加载表格
-    private void initCharts(String objectId){
-
+    // 加载柱状图表格
+    private void initBarCharts(String objectId){
         BmobQuery<Order> query = new BmobQuery<>();
         query.addWhereEqualTo("storeObjectId", objectId);
         query.findObjects(new FindListener<Order>() {
@@ -304,8 +309,8 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // 绘画表格
-    private void drawCharts(ArrayList<ArrayList<Float>> dataCharts){
+    // 绘画柱状表格
+    private void drawBarCharts(ArrayList<ArrayList<Float>> dataCharts){
         BarChartManager barChartManager = new BarChartManager(mBarChart);
         ArrayList<Float> xValues = new ArrayList<>();
         for (int i = 0; i < dataCharts.size(); i++) {
@@ -344,5 +349,53 @@ public class HomeFragment extends Fragment {
         barChartManager.setXAxis(6.5f, 0f, 5);
 
 //        Toast.makeText(getActivity(),"完成绘图",Toast.LENGTH_SHORT).show();
+    }
+
+    private void initLineCharts(String objectId){
+        BmobQuery<Order> query = new BmobQuery<>();
+        query.addWhereEqualTo("storeObjectId", objectId);
+        query.findObjects(new FindListener<Order>() {
+            @Override
+            public void done(List<Order> list, BmobException e) {
+                if (e == null) {
+                    Calendar c = Calendar.getInstance();
+                    SimpleDateFormat format =  new SimpleDateFormat("dd");
+                    int today = Integer.parseInt(format.format(c.getTime()));
+                    List<Float> sumPrice = new ArrayList<>();
+                    for(int i = 0; i < 7; i++){
+                        sumPrice.add(0f);
+                    }
+                    for(Order order : list){
+                        String date = order.getUpdatedAt().split(" ")[0];
+                        int day = Integer.parseInt(date.split("-")[2]);
+                        int index =today - day;
+                        if(index < 7){
+                            sumPrice.set(index, sumPrice.get(index) + order.getSumPrice());
+                        }
+                    }
+                    Log.i("TAG", "today: " + today);
+
+                    drawLineCharts(sumPrice);
+                }else{
+                    Log.d("TAG", "error: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    // 绘画折线图
+    private void drawLineCharts(List<Float> yValue){
+        LineChartManager lineChartManager = new LineChartManager(mLineChart);
+        //设置x轴的数据
+        ArrayList<Float> xValues = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            xValues.add((float) i);
+        }
+
+        //创建多条折线的图表
+        lineChartManager.showLineChart(xValues, yValue, "销量", Color.CYAN);
+        lineChartManager.setDescription("七天总销量");
+        lineChartManager.setYAxis(100, 0, 7);
+        lineChartManager.setHightLimitLine(70,"销量基准线",Color.RED);
     }
 }
