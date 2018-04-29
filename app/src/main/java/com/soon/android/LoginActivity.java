@@ -82,14 +82,14 @@ public class LoginActivity extends AppCompatActivity {
                                                 editor.putString("name", store.getName());
                                                 editor.putString("objectId", store.getObjectId());
                                                 editor.putString("image", store.getImage().getFilename());
+                                                editor.putString("description", store.getDescription());
+                                                editor.putString("state", "已认证");
                                                 try{
                                                     editor.putFloat("offerPrice", store.getOfferPrice());
                                                 }catch (Exception e1){
                                                     editor.putFloat("offerPrice", 0f);
 //                                                    Log.i("Exception", "错误信息: " + e.getMessage());
                                                 }finally {
-                                                    editor.putString("description", store.getDescription());
-                                                    editor.putString("state", "已认证");
                                                     editor.apply();
                                                     Toast.makeText(LoginActivity.this, "登录成功！" + store.getName(), Toast.LENGTH_SHORT).show();
                                                     Log.d("TAG", "success");

@@ -135,6 +135,18 @@ public class PersonalCenterActivity extends AppCompatActivity {
                                         public void run() {
                                             progressDialog.dismiss();
                                             Toast.makeText(PersonalCenterActivity.this,"更新成功!", Toast.LENGTH_SHORT).show();
+                                            SharedPreferences.Editor editor = getSharedPreferences("store",MODE_PRIVATE).edit();
+                                            editor.putString("name", StoreNewNameText.getText().toString());
+//                                            editor.putString("image", bmobFile.getFilename());
+                                            try{
+                                                editor.putFloat("offerPrice", Float.parseFloat(StoreOfferPriceText.getText().toString()));
+                                            }catch (Exception e1){
+                                                editor.putFloat("offerPrice", 0f);
+//                                                    Log.i("Exception", "错误信息: " + e.getMessage());
+                                            }finally {
+                                                editor.putString("description", StoreDescriptionText.getText().toString());
+                                                editor.apply();
+                                            }
                                         }
                                     });
                                 }else{
