@@ -85,4 +85,7 @@ dependencies {
     //圆形图片
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
+    //ViewPager指示器NavigationTabStrip
+    compile 'com.github.devlight.navigationtabstrip:navigationtabstrip:1.0.4'
+
 }

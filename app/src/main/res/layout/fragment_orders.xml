@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.soon.android.fragments.OrdersFragment">
 
     <LinearLayout
@@ -20,20 +21,37 @@
             android:background="@color/colorPrimary"
             android:textColor="#ffffff"/>
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh"
+        <com.gigamole.navigationtabstrip.NavigationTabStrip
+            android:id="@+id/navigation_tab_strip"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            app:nts_active_color="#42a4d1"
+            app:nts_color="#42a4d1"
+            app:nts_corners_radius="1dp"
+            app:nts_inactive_color="#ff1a1e23"
+            app:nts_size="15sp"
+            app:nts_weight="3dp" />
 
-            <android.support.v4.widget.NestedScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true"></android.support.v4.view.ViewPager>
+        <!--<android.support.v4.widget.SwipeRefreshLayout-->
+            <!--android:id="@+id/swipe_refresh"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/order_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
-            </android.support.v4.widget.NestedScrollView>
-        </android.support.v4.widget.SwipeRefreshLayout>
+            <!--<android.support.v4.widget.NestedScrollView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+
+                <!--<android.support.v7.widget.RecyclerView-->
+                    <!--android:id="@+id/order_list"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>-->
+            <!--</android.support.v4.widget.NestedScrollView>-->
+        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -1,119 +1,157 @@
 package com.soon.android.fragments;
 
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.gigamole.navigationtabstrip.NavigationTabStrip;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.soon.android.MyApplication;
 import com.soon.android.R;
-import com.soon.android.adapters.OrderFragmentViewPagerAdaper;
+import com.soon.android.adapters.OrderListAdapter;
+import com.soon.android.bmobBean.Order;
+import com.soon.android.util.ProgressDialogUtil;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobRealTimeData;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.UpdateListener;
+import cn.bmob.v3.listener.ValueEventListener;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class OrdersFragment extends Fragment {
-    /*
+public class OngoingOrderFragment extends Fragment {
 
-        @BindView(R.id.order_list)
-        RecyclerView orderList;*/
+
+    @BindView(R.id.order_list)
+    RecyclerView orderList;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefresh;
     Unbinder unbinder;
-    @BindView(R.id.navigation_tab_strip)
-    NavigationTabStrip navigationTabStrip;
-    @BindView(R.id.view_pager)
-    ViewPager viewPager;
 
-    /*   @BindView(R.id.swipe_refresh)
-       SwipeRefreshLayout swipeRefresh;
+    private ProgressDialog progressDialog;
 
-       private ProgressDialog progressDialog;
+    private String storeObjectId;
 
-       private String storeObjectId;
+    private List<Order> orderListData = new ArrayList<>();//订单数据
 
-       private List<Order> orderListData = new ArrayList<>();//订单数据
+    private final int ORDERLISTDATA = 2;//订单数据
 
-       private final int ORDERLISTDATA = 2;//订单数据
+    private Handler handler = new Handler() {
 
-       private Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case ORDERLISTDATA:
+                    orderListData = (List<Order>) msg.obj;
+                    loadOrderList();
+                    swipeRefresh.setRefreshing(false);
+                    progressDialog.dismiss();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
-           public void handleMessage(Message msg) {
-               switch (msg.what) {
-                   case ORDERLISTDATA:
-                       orderListData = (List<Order>) msg.obj;
-                       loadOrderList();
-                       swipeRefresh.setRefreshing(false);
-                       progressDialog.dismiss();
-                       break;
-                   default:
-                       break;
-               }
-           }
-       };
-   */
-    public OrdersFragment() {
+
+
+    public OngoingOrderFragment() {
         // Required empty public constructor
     }
 
+    public static OngoingOrderFragment newInstance(int orderStatus){
+        OngoingOrderFragment ongoingOrderFragment = new OngoingOrderFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("orderStatus", orderStatus);
+        ongoingOrderFragment.setArguments(bundle);
+        return ongoingOrderFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_orders, container, false);
+        View view = inflater.inflate(R.layout.fragment_ongoing_order, container, false);
         unbinder = ButterKnife.bind(this, view);
-/*
-        progressDialog = ProgressDialogUtil.getProgressDialog(getActivity(), "操作中", "Waiting...", false);
 
-        storeObjectId = "HNle888E";
+        progressDialog = ProgressDialogUtil.getProgressDialog(getActivity(), null, "Waiting...", false);
+
+        SharedPreferences preferences = getActivity().getSharedPreferences("store", Context.MODE_PRIVATE);
+        storeObjectId = preferences.getString("objectId", "");
 
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 queryOrdersByStoreId(storeObjectId);
             }
-        });*/
+        });
+
+
+
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-       /* if (orderListData.size() == 0 || orderListData.isEmpty()) {
+        if (orderListData.size() == 0 || orderListData.isEmpty()) {
+            progressDialog.show();
             queryOrdersByStoreId(storeObjectId);
         } else {
             loadOrderList();
-        }*/
-
-        OrderFragmentViewPagerAdaper orderFragmentViewPagerAdaper = new OrderFragmentViewPagerAdaper(getActivity().getSupportFragmentManager());
-        viewPager.setAdapter(orderFragmentViewPagerAdaper);
-        navigationTabStrip.setTitles("正在进行中", "已付款", "已完成", "评论");
-        navigationTabStrip.setViewPager(viewPager);
+        }
     }
-/*
+
+
+
     //根据店铺id查询对应的订单
     private void queryOrdersByStoreId(String storeObjectId) {
         Toast.makeText(MyApplication.getContext(), "id:" + storeObjectId, Toast.LENGTH_SHORT).show();
         BmobQuery<Order> query = new BmobQuery<Order>();
         query.addWhereEqualTo("storeObjectId", storeObjectId);
+        query.addWhereEqualTo("status", 2);
+        query.order("-createdAt");
         query.findObjects(new FindListener<Order>() {
             @Override
             public void done(List<Order> object, BmobException e) {
                 if (e == null) {
-                    Message message = new Message();
-                    message.what = ORDERLISTDATA;
-                    message.obj = object;
-                    handler.sendMessage(message);
+                    if (object.size() == 0 || object.isEmpty()){
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "暂无数据", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Message message = new Message();
+                        message.what = ORDERLISTDATA;
+                        message.obj = object;
+                        handler.sendMessage(message);
+                    }
                 } else {
-                    Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
+                   //Log.i("bmob", "失败：" + e.getMessage() + "," + e.getErrorCode());
                 }
             }
         });
@@ -161,14 +199,6 @@ public class OrdersFragment extends Fragment {
             }
         });
     }
-
-    //查看评价
-    private void seeTheEvaluation(){
-
-    }
-
-
-*/
 
     @Override
     public void onDestroyView() {

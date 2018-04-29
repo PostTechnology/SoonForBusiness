@@ -8,4 +8,9 @@
         android:title="AddDish"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/manage_sort"
+        android:icon="@drawable/ic_manage_sort"
+        android:title="种类管理"
+        app:showAsAction="never" />
 </menu>
