@@ -25,14 +25,15 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="92FIToPqHZBgNg4t3MHvx0lqv7iAq3de" />
 
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".MainActivity" />
 
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
 
-        <activity android:name=".LoginActivity" >
+        <activity android:name=".LoginActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,8 +47,11 @@
             android:name=".AuthenticationActivity"
             android:label="商家认证" />
         <activity android:name=".LocalPoiActivity" />
-        <activity android:name=".PersonalCenterActivity"></activity>
-        <activity android:name=".AddDishesActivity"></activity>
+        <activity android:name=".PersonalCenterActivity" />
+        <activity android:name=".AddDishesActivity" />
+        <activity android:name=".RegisterActivity"
+            android:launchMode="singleTask"
+            android:label="商家注册"></activity>
     </application>
 
 </manifest>
