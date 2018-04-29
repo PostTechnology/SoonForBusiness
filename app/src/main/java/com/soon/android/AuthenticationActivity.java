@@ -106,6 +106,9 @@ public class AuthenticationActivity extends AppCompatActivity {
         store.setImage(bmobFile);
         store.setLongitude(longitude);
         store.setLatitude(latitude);
+        store.setOfferPrice(0f);
+        store.setRating(0f);
+        store.setSalesVolume(0);
         store.save(new SaveListener<String>() {
             @Override
             public void done(String s, BmobException e) {
@@ -116,6 +119,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                             progressDialog.dismiss();
                             Toast.makeText(AuthenticationActivity.this,"认证成功！请重新登录", Toast.LENGTH_SHORT).show();
                             BmobUser.logOut();   //清除缓存用户对象
+                            LoginActivity.actionStart(AuthenticationActivity.this);
                             finish();
                         }
                     });
