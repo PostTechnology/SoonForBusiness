@@ -1,6 +1,9 @@
 package com.soon.android.fragments;
 
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,6 +31,7 @@ import com.soon.android.R;
 import com.soon.android.adapters.DishesListAdapter;
 import com.soon.android.adapters.SortListAdapter;
 import com.soon.android.bmobBean.Goods;
+import com.soon.android.util.ProgressDialogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SQLQueryListener;
@@ -77,6 +82,7 @@ public class DishesFragment extends Fragment {
                     dishesData = (List<Goods>) msg.obj;
                     loadGoods();
                     swipeRefresh.setRefreshing(false);
+                    progressDialog.dismiss();
                     break;
                 case SORTLOAD:
                     List<String> list = new ArrayList<>();
@@ -91,6 +97,10 @@ public class DishesFragment extends Fragment {
             }
         }
     };
+
+    private ProgressDialog progressDialog;
+
+    private String storeObjectId;
 
     public DishesFragment() {
         // Required empty public constructor
@@ -110,15 +120,21 @@ public class DishesFragment extends Fragment {
         }
         setHasOptionsMenu(true);//加上这句话，menu才会显示出来
 
+        SharedPreferences preferences = getActivity().getSharedPreferences("store", Context.MODE_PRIVATE);
+        storeObjectId = preferences.getString("objectId", "");
+
+
         //设置下拉刷新
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                queryGoods("HNle888E");
-                querySort("HNle888E");
+                queryGoods(storeObjectId);
+                querySort(storeObjectId);
             }
         });
+
+        progressDialog = ProgressDialogUtil.getProgressDialog(getActivity(), null, "Waiting...", false);
         return view;
     }
 
@@ -126,8 +142,9 @@ public class DishesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if ((dishesData.size() == 0 || dishesData.isEmpty()) && (sortData.size() == 0 && sortData.isEmpty())) {
-            queryGoods("HNle888E");
-            querySort("HNle888E");
+            progressDialog.show();
+            queryGoods(storeObjectId);
+            querySort(storeObjectId);
         } else {
             loadGoods();
             loadSort(sortData);
@@ -164,23 +181,6 @@ public class DishesFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         sortList.setLayoutManager(layoutManager);
         sortListAdapter = new SortListAdapter(R.layout.sort_list_item, sortData);
-        //联动
-//        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-//                if (position == 0) {
-//                    foodRecyclerView.scrollToPosition(0);
-//                    LinearLayoutManager mLayoutManager =
-//                            (LinearLayoutManager) foodRecyclerView.getLayoutManager();
-//                    mLayoutManager.scrollToPositionWithOffset(0, 0);
-//                } else {
-//                    foodRecyclerView.scrollToPosition(5);
-//                    LinearLayoutManager mLayoutManager =
-//                            (LinearLayoutManager) foodRecyclerView.getLayoutManager();
-//                    mLayoutManager.scrollToPositionWithOffset(5, 0);
-//                }
-//            }
-//        });
         sortList.setAdapter(sortListAdapter);
     }
 
@@ -202,6 +202,8 @@ public class DishesFragment extends Fragment {
                         Log.i("smile", "查询成功：共" + list.size() + "条数据。");
                     } else {
                         Log.i("smile", "查询成功，无数据返回");
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "暂无数据", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.i("smile", "错误码：" + e.getErrorCode() + "，错误描述：" + e.getMessage());
@@ -218,7 +220,7 @@ public class DishesFragment extends Fragment {
         dishesListAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                //Toast.makeText(MyApplication.getContext(), "onItemChildClick" + position, Toast.LENGTH_SHORT).show();
+
             }
         });
         dishesList.setAdapter(dishesListAdapter);

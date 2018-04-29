@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -109,6 +110,8 @@ public class AddDishesActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private String storeObjectId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,8 +123,10 @@ public class AddDishesActivity extends AppCompatActivity {
             actionBar.setTitle("添加菜品");
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
+        storeObjectId = preferences.getString("objectId", "");
 
-        querySort("HNle888E");
+        querySort(storeObjectId);
     }
 
     @Override

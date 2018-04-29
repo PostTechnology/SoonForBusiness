@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -24,22 +25,29 @@ import com.soon.android.fragments.HomeFragment;
 import com.soon.android.fragments.OrdersFragment;
 import com.soon.android.fragments.PersonalInformationFragment;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobRealTimeData;
+import cn.bmob.v3.listener.ValueEventListener;
 
 
 public class MainActivity extends AppCompatActivity {
     LineChart mLineChart;
 
+    private static final String TAG = "MainActivity";
     @BindView(R.id.content_container)
     FrameLayout contentContainer;
 
     @BindView(R.id.bottom_bar)
     BottomBar bottomBar;
+
+    BmobRealTimeData rtd = new BmobRealTimeData();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,11 +108,11 @@ public class MainActivity extends AppCompatActivity {
         final DishesFragment dishesFragment = new DishesFragment();
         final OrdersFragment ordersFragment = new OrdersFragment();
         final PersonalInformationFragment personalInformationFragment = new PersonalInformationFragment();
+        SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
+        final String state = preferences.getString("state","");
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(int tabId) {
-                SharedPreferences preferences = getSharedPreferences("store", Context.MODE_PRIVATE);
-                String state = preferences.getString("state","");
                 if(state.equals("已认证")){
                     switch (tabId) {
                         case R.id.tab_home:
@@ -152,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.content_container, fragment);
-                transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -162,4 +169,30 @@ public class MainActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
+
+//    //监控订单状态
+//    private void monitorOfOrder(){
+//        Bmob.initialize(this, "84aaecd322d3f4afa028222b754f2f98");
+//        rtd.start(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(JSONObject data) {
+//                Log.d(TAG, "onDataChange: ");
+//            }
+//
+//            @Override
+//            public void onConnectCompleted(Exception ex) {
+//                Log.d(TAG, "连接成功111" + rtd.isConnected());
+////                rtd.subTableUpdate("Goods");
+////                if(rtd.isConnected()){
+////                    // 监听表更新
+////
+////                    Log.d(TAG, "监听成功");
+////                }else{
+////                    Log.d(TAG, "监听失败");
+////                }
+//                //rtd.subTableUpdate("Order");
+//            }
+//        });
+//
+//    }
 }
