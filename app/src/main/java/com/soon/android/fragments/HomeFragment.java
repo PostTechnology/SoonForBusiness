@@ -202,8 +202,12 @@ public class HomeFragment extends Fragment {
                             revenue += order.getSumPrice();
                             ordernum++;
                             if (order.getStatus() == 3){
-                                praise += order.getRating();
-                                praisenum++;
+                                try{
+                                    praise += order.getRating();
+                                    praisenum++;
+                                }catch (Exception ex){
+
+                                }
                             }
                         }
                         if (order.getUpdatedAt().substring(0, 10).equals(today) && order.getStatus() > 1) {
