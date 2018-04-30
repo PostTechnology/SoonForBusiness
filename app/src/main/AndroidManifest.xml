@@ -32,7 +32,8 @@
             android:enabled="true"
             android:process=":remote" />
 
-        <activity android:name=".LoginActivity"
+        <activity
+            android:name=".LoginActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,9 +50,11 @@
         <activity android:name=".LocalPoiActivity" />
         <activity android:name=".PersonalCenterActivity" />
         <activity android:name=".AddDishesActivity" />
-        <activity android:name=".RegisterActivity"
-            android:launchMode="singleTask"
-            android:label="商家注册"></activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:label="商家注册"
+            android:launchMode="singleTask" />
+        <activity android:name=".OrderDetailsActivity"></activity>
     </application>
 
 </manifest>
