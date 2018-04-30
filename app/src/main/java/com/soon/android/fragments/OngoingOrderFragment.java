@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.soon.android.MyApplication;
+import com.soon.android.OrderDetailsActivity;
 import com.soon.android.R;
 import com.soon.android.adapters.OrderListAdapter;
 import com.soon.android.bmobBean.Order;
@@ -128,7 +129,11 @@ public class OngoingOrderFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
+    }
 
     //根据店铺id查询对应的订单
     private void queryOrdersByStoreId(String storeObjectId) {
@@ -179,6 +184,15 @@ public class OngoingOrderFragment extends Fragment {
                 }
             }
         });
+
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Order order = orderListData.get(position);
+                OrderDetailsActivity.actionStart(getActivity(), order);
+            }
+        });
+
         orderList.setAdapter(adapter);
     }
 

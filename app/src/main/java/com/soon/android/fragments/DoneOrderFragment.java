@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.soon.android.MyApplication;
+import com.soon.android.OrderDetailsActivity;
 import com.soon.android.R;
 import com.soon.android.adapters.OrderListAdapter;
 import com.soon.android.bmobBean.Order;
@@ -159,6 +160,15 @@ public class DoneOrderFragment extends Fragment {
                 }
             }
         });
+
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Order order = orderListData.get(position);
+                OrderDetailsActivity.actionStart(getActivity(), order);
+            }
+        });
+
         orderList.setAdapter(adapter);
     }
 

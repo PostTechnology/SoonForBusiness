@@ -15,7 +15,7 @@ public class DeliveryAddress {
      */
 
     private String name;
-    private long tel;
+    private String tel;
     private String location;
     private String doorNum;
 
@@ -27,11 +27,11 @@ public class DeliveryAddress {
         this.name = name;
     }
 
-    public long getTel() {
+    public String getTel() {
         return tel;
     }
 
-    public void setTel(long tel) {
+    public void setTel(String tel) {
         this.tel = tel;
     }
 
