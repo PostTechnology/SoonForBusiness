@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +17,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.soon.android.R;
 import com.soon.android.bmobBean.Goods;
 import com.soon.android.bmobBean.Order;
 import com.soon.android.util.BarChartManager;
 import com.soon.android.util.LineChartManager;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,6 +77,9 @@ public class HomeFragment extends Fragment {
 
     @BindView(R.id.linechart)
     LineChart mLineChart;
+
+    @BindView(R.id.piechart)
+    PieChart mPieChart;
 
     private Handler handler1 = new Handler() {
         public void handleMessage(Message msg) {
@@ -155,12 +168,15 @@ public class HomeFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mBarChart.setNoDataText("没有数据哦！");
+        mLineChart.setNoDataText("没有数据哦！");
+        mPieChart.setNoDataText("没有数据哦！");
 //        Toast.makeText(getActivity(),"开始绘图",Toast.LENGTH_SHORT).show();
         SharedPreferences preferences = getActivity().getSharedPreferences("store", Context.MODE_PRIVATE);
         String objectId = preferences.getString("objectId", "");
         initHeader(objectId);
         initBarCharts(objectId);
         initLineCharts(objectId);
+        initPieCharts(objectId);
     }
 
     // 加载栏目
@@ -186,8 +202,12 @@ public class HomeFragment extends Fragment {
                             revenue += order.getSumPrice();
                             ordernum++;
                             if (order.getStatus() == 3){
-                                praise += order.getRating();
-                                praisenum++;
+                                try{
+                                    praise += order.getRating();
+                                    praisenum++;
+                                }catch (Exception ex){
+
+                                }
                             }
                         }
                         if (order.getUpdatedAt().substring(0, 10).equals(today) && order.getStatus() > 1) {
@@ -204,6 +224,7 @@ public class HomeFragment extends Fragment {
                     arrayList1.add(String.format("%.2f", revenue)+"元");
                     arrayList1.add(Integer.toString(ordernum)+"单");
                     arrayList2.add(Integer.toString(orderAmount));
+                    Log.i("data", "arrayList1: " + arrayList1.get(0) + "," + arrayList1.get(1) + "," + arrayList1.get(0));
                     arrayList2.add(Integer.toString(orderFinish));
                     arrayList2.add(Integer.toString(orderAmount - orderFinish));
                     arrayList2.add(String.format("%.2f", revenueToday));
@@ -220,7 +241,7 @@ public class HomeFragment extends Fragment {
                     handler2.sendMessage(msg2);
                     handler3.sendMessage(msg3);
                 } else {
-                    Log.d("TAG", "error: " + e.getMessage());
+                    Log.d("TAG", "headererror: " + e.getMessage());
                 }
             }
         });
@@ -236,7 +257,7 @@ public class HomeFragment extends Fragment {
                     msg.obj = Integer.toString(list.size()) + "个";
                     handler4.sendMessage(msg);
                 } else {
-                    Log.d("TAG", "error: " + e.getMessage());
+                    Log.d("TAG", "headererror: " + e.getMessage());
                 }
             }
         });
@@ -304,7 +325,7 @@ public class HomeFragment extends Fragment {
                     msg.obj = values;
                     drawHandler.sendMessage(msg);
                 }else{
-                    Log.d("TAG", "error: " + e.getMessage());
+                    Log.d("TAG", "barerror: " + e.getMessage());
                 }
             }
         });
@@ -352,6 +373,7 @@ public class HomeFragment extends Fragment {
 //        Toast.makeText(getActivity(),"完成绘图",Toast.LENGTH_SHORT).show();
     }
 
+    // 加载折线图数据
     private void initLineCharts(String objectId){
         BmobQuery<Order> query = new BmobQuery<>();
         query.addWhereEqualTo("storeObjectId", objectId);
@@ -398,5 +420,139 @@ public class HomeFragment extends Fragment {
         lineChartManager.setDescription("七天总销量");
         lineChartManager.setYAxis(100, 0, 7);
         lineChartManager.setHightLimitLine(70,"销量基准线",Color.RED);
+    }
+
+    // 加载饼图数据
+    private void initPieCharts(String objectId){
+        BmobQuery<Order> query = new BmobQuery<>();
+        query.addWhereEqualTo("storeObjectId", objectId);
+        query.findObjects(new FindListener<Order>() {
+            @Override
+            public void done(List<Order> list, BmobException e) {
+                if (e == null) {
+                    Calendar c = Calendar.getInstance();
+                    SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    List<Integer> times = new ArrayList<>();
+                    for(int i = 0; i < 3; i++){
+                        times.add(0);
+                    }
+                    for(Order order : list){
+                        try {
+                            Date today = format.parse(order.getUpdatedAt());
+                            if(today.getHours() < 12){
+                                times.set(0,times.get(0) + 1);
+                            }else if(today.getHours() > 12 && today.getHours() < 18){
+                                times.set(1,times.get(1) + 1);
+                            }else{
+                                times.set(2,times.get(2) + 1);
+                            }
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+
+                    drawPieCharts(times);
+                }else{
+                    Log.d("TAG", "error: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    // 绘画饼图
+    private void drawPieCharts(List<Integer> times){
+        mPieChart.setUsePercentValues(true);
+        mPieChart.getDescription().setEnabled(false);
+        mPieChart.setExtraOffsets(5, 10, 5, 5);
+
+        mPieChart.setDragDecelerationFrictionCoef(0.95f);
+        //设置中间文件
+        mPieChart.setCenterText(generateCenterSpannableText());
+
+        mPieChart.setDrawHoleEnabled(true);
+        mPieChart.setHoleColor(Color.WHITE);
+
+        mPieChart.setTransparentCircleColor(Color.WHITE);
+        mPieChart.setTransparentCircleAlpha(110);
+
+        mPieChart.setHoleRadius(58f);
+        mPieChart.setTransparentCircleRadius(61f);
+
+        mPieChart.setDrawCenterText(true);
+
+        mPieChart.setRotationAngle(0);
+        // 触摸旋转
+        mPieChart.setRotationEnabled(true);
+        mPieChart.setHighlightPerTapEnabled(true);
+
+        //变化监听
+//        mPieChart.setOnChartValueSelectedListener(this);
+
+        //模拟数据
+        ArrayList<PieEntry> entries = new ArrayList<PieEntry>();
+        entries.add(new PieEntry(times.get(0), "早餐"));
+        entries.add(new PieEntry(times.get(1), "午餐"));
+        entries.add(new PieEntry(times.get(2), "晚餐"));
+
+        //设置数据
+        setData(entries);
+
+        mPieChart.animateY(1400, Easing.EasingOption.EaseInOutQuad);
+
+        Legend l = mPieChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(0f);
+        l.setYOffset(0f);
+
+        // 输入标签样式
+        mPieChart.setEntryLabelColor(Color.WHITE);
+        mPieChart.setEntryLabelTextSize(12f);
+    }
+
+    //设置中间文字
+    private SpannableString generateCenterSpannableText() {
+        //原文：MPAndroidChart\ndeveloped by Philipp Jahoda
+        SpannableString s = new SpannableString("早中晚销量分布图");
+        //s.setSpan(new RelativeSizeSpan(1.7f), 0, 14, 0);
+        //s.setSpan(new StyleSpan(Typeface.NORMAL), 14, s.length() - 15, 0);
+        // s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
+        //s.setSpan(new RelativeSizeSpan(.8f), 14, s.length() - 15, 0);
+        // s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
+        // s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
+        return s;
+    }
+
+    //设置数据
+    private void setData(ArrayList<PieEntry> entries) {
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
+
+        //数据和颜色
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+        for (int c : ColorTemplate.VORDIPLOM_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.JOYFUL_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.LIBERTY_COLORS)
+            colors.add(c);
+        for (int c : ColorTemplate.PASTEL_COLORS)
+            colors.add(c);
+        colors.add(ColorTemplate.getHoloBlue());
+        dataSet.setColors(colors);
+        PieData data = new PieData(dataSet);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.WHITE);
+        mPieChart.setData(data);
+        mPieChart.highlightValues(null);
+        //刷新
+        mPieChart.invalidate();
     }
 }

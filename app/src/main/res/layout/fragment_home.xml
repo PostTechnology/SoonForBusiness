@@ -31,7 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:text="0.22次"
+                    android:text="0次"
                     android:textAlignment="center"
                     android:textColor="#fff"
                     android:textSize="18sp"
@@ -59,7 +59,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:text="0.22次"
+                    android:text="0次"
                     android:textAlignment="center"
                     android:textColor="#fff"
                     android:textSize="18sp"
@@ -87,7 +87,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:text="0.22次"
+                    android:text="0次"
                     android:textAlignment="center"
                     android:textColor="#fff"
                     android:textSize="18sp"
@@ -231,7 +231,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="70"
+                        android:text="0"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark" />
                 </LinearLayout>
@@ -258,7 +258,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="60"
+                        android:text="0"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark" />
                 </LinearLayout>
@@ -286,7 +286,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="10"
+                        android:text="0"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark" />
                 </LinearLayout>
@@ -314,7 +314,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="700"
+                        android:text="0"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark" />
                 </LinearLayout>
@@ -371,12 +371,37 @@
                         android:layout_weight="1"
                         android:background="#FAFAFA"
                         android:padding="5dp"
-                        android:text="近七天总销量"
+                        android:text="近七天总营业额"
                         android:textColor="#000"
                         android:textSize="12sp" />
 
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/linechart"
+                        android:layout_width="match_parent"
+                        android:layout_height="350dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/home_module"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="#FAFAFA"
+                        android:padding="5dp"
+                        android:text="早中晚销量分布图"
+                        android:textColor="#000"
+                        android:textSize="12sp" />
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/piechart"
                         android:layout_width="match_parent"
                         android:layout_height="350dp" />
                 </LinearLayout>
