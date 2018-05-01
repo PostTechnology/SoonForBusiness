@@ -88,4 +88,7 @@ dependencies {
     //ViewPager指示器NavigationTabStrip
     compile 'com.github.devlight.navigationtabstrip:navigationtabstrip:1.0.4'
 
+    // 评分控件
+    compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
+
 }
