@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
@@ -175,7 +174,9 @@ public class HomeFragment extends Fragment {
         String objectId = preferences.getString("objectId", "");
         initHeader(objectId);
         initBarCharts(objectId);
+        Log.i("initLineCharts", "done: 1");
         initLineCharts(objectId);
+        Log.i("initLineCharts", "done: 2");
         initPieCharts(objectId);
     }
 
@@ -381,9 +382,12 @@ public class HomeFragment extends Fragment {
             @Override
             public void done(List<Order> list, BmobException e) {
                 if (e == null) {
+                    Log.i("TAG", "done: " + list.size());
                     Calendar c = Calendar.getInstance();
-                    SimpleDateFormat format =  new SimpleDateFormat("dd");
-                    int today = Integer.parseInt(format.format(c.getTime()));
+                    SimpleDateFormat format1 =  new SimpleDateFormat("dd");
+                    SimpleDateFormat format2 =  new SimpleDateFormat("MM");
+                    int today = Integer.parseInt(format1.format(c.getTime()));
+                    int tomonth = Integer.parseInt(format2.format(c.getTime()));
                     List<Float> sumPrice = new ArrayList<>();
                     for(int i = 0; i < 7; i++){
                         sumPrice.add(0f);
@@ -391,13 +395,13 @@ public class HomeFragment extends Fragment {
                     for(Order order : list){
                         String date = order.getUpdatedAt().split(" ")[0];
                         int day = Integer.parseInt(date.split("-")[2]);
-                        int index =today - day;
+                        int month = Integer.parseInt(date.split("-")[1]);
+                        int index = today + (tomonth - month) * 30 - day;
                         if(index < 7){
                             sumPrice.set(index, sumPrice.get(index) + order.getSumPrice());
                         }
                     }
                     Log.i("TAG", "today: " + today);
-
                     drawLineCharts(sumPrice);
                 }else{
                     Log.d("TAG", "error: " + e.getMessage());
